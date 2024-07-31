@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=3 uid="uid://c3ijkwmrxhxf1"]
+
+[ext_resource type="Script" path="res://scripts/world.gd" id="1_gboxl"]
+[ext_resource type="PackedScene" uid="uid://clunpvoh2n2nl" path="res://scenes/scene_main.tscn" id="2_w7b74"]
+[ext_resource type="PackedScene" uid="uid://btq3opu7jlaxs" path="res://scenes/player.tscn" id="3_tb606"]
+[ext_resource type="PackedScene" uid="uid://7fov7i38bxxu" path="res://scenes/gui.tscn" id="4_2d3a0"]
+[ext_resource type="PackedScene" uid="uid://br770st3m6h72" path="res://scenes/obstacle_spawner.tscn" id="4_yi6wa"]
+
+[node name="World" type="Node"]
+script = ExtResource("1_gboxl")
+
+[node name="SceneMain" parent="." instance=ExtResource("2_w7b74")]
+
+[node name="Player" parent="." instance=ExtResource("3_tb606")]
+position = Vector2(352, 202)
+
+[node name="ObstacleSpawner" parent="." instance=ExtResource("4_yi6wa")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+
+[node name="GUI" parent="." instance=ExtResource("4_2d3a0")]

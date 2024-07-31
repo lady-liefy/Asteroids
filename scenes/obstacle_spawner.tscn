@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://br770st3m6h72"]
+
+[ext_resource type="Script" path="res://scripts/obstacle_spawner.gd" id="1_804jw"]
+
+[node name="ObstacleSpawner" type="Node"]
+script = ExtResource("1_804jw")
+
+[node name="SpawnTimer" type="Timer" parent="."]
+autostart = true

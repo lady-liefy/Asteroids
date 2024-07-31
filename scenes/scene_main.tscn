@@ -1,0 +1,50 @@
+[gd_scene load_steps=5 format=3 uid="uid://clunpvoh2n2nl"]
+
+[ext_resource type="Script" path="res://scripts/scene_main.gd" id="1_73ntg"]
+[ext_resource type="Script" path="res://scripts/kill_zone.gd" id="2_xicde"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bvxkd"]
+size = Vector2(1280, 38)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_03fch"]
+size = Vector2(60, 2337)
+
+[node name="SceneMain" type="Node2D"]
+script = ExtResource("1_73ntg")
+
+[node name="Background" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1280, 720)
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.53775, 0.4505, 0.561365, 1)
+
+[node name="Ceiling" type="StaticBody2D" parent="."]
+position = Vector2(640, -29)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling"]
+position = Vector2(0, 9)
+shape = SubResource("RectangleShape2D_bvxkd")
+
+[node name="Floor" type="Area2D" parent="."]
+position = Vector2(640, 823)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+position = Vector2(0, -105)
+shape = SubResource("RectangleShape2D_bvxkd")
+
+[node name="ColorRect" type="ColorRect" parent="Floor"]
+offset_left = -645.0
+offset_top = -124.0
+offset_right = 645.0
+offset_bottom = -85.0
+color = Color(0.35227, 0.431305, 0.276382, 1)
+
+[node name="KillZone" type="Area2D" parent="."]
+script = ExtResource("2_xicde")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="KillZone"]
+position = Vector2(-87, 656.5)
+shape = SubResource("RectangleShape2D_03fch")
+
+[connection signal="body_entered" from="Floor" to="." method="_on_floor_body_entered"]
+[connection signal="body_entered" from="KillZone" to="KillZone" method="_on_body_entered"]

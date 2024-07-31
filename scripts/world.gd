@@ -1,0 +1,2 @@
+### World.gd
+extends Node
