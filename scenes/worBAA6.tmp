@@ -12,7 +12,7 @@ script = ExtResource("1_gboxl")
 [node name="Level" parent="." instance=ExtResource("2_kxggi")]
 
 [node name="Player" parent="." instance=ExtResource("3_tb606")]
-speed = 250
+speed = 200
 boost_speed = 300
 rotation_speed = 2.5
 rate_of_fire = 0.1

@@ -1,18 +1,22 @@
+### gui.gd
 extends Node
 
 @export var score_counter : Label
+@export var lives_counter : Label
 @export var high_score_counter : Label
 
 @onready var button_play_again = $CanvasLayer/MarginContainer/VBoxContainer/ButtonPlayAgain
 @onready var button_resume = $CanvasLayer/MarginContainer/VBoxContainer/ButtonResume
 @onready var button_exit = $CanvasLayer/MarginContainer/VBoxContainer/ButtonExit
 @onready var button_quit_game = $CanvasLayer/MarginContainer/VBoxContainer/ButtonQuitGame
-@onready var health_bar = $Health
+@onready var button_next_level = $CanvasLayer/MarginContainer/VBoxContainer/ButtonNextLevel
 
-@onready var scene_to_load = Preloads.scene_paths["Main_Menu"]
+@onready var level_won = $CanvasLayer/MarginContainer/VBoxContainer/LevelWon
 
+@onready var scene_to_load = Global.scene_paths["Main_Menu"]
 
-# Called when the node enters the scene tree for the first time.
+signal level_finished
+
 func _ready() -> void:
 	self._initialize_signals()
 	self._initialize()
@@ -20,60 +24,117 @@ func _ready() -> void:
 func _initialize_signals() -> void:
 	ScoreManager.current_score_changed.connect(set_current_score)
 	ScoreManager.high_score_changed.connect(set_high_score)
+	ScoreManager.current_lives_changed.connect(set_current_lives)
+	
 	Events.game_over.connect(_on_game_over)
 	Events.game_paused.connect(_on_game_paused)
 	Events.game_resumed.connect(_on_game_resumed)
-	Events.health_changed.connect(set_health_bar)
-	
+	Events.level_won.connect(on_level_won)
+
 func _initialize() -> void:
-	set_current_score(0)
+	set_current_score(ScoreManager.current_score)
+	set_current_lives(ScoreManager.current_lives)
 	set_high_score(ScoreManager.high_score)
 
 func _physics_process(_delta : float) -> void:
 	if Input.is_action_just_pressed("pause"):
 		if not get_tree().is_paused():
-			Events.game_paused.emit()
+			Events.emit_signal("game_paused")
 		else:
-			Events.game_resumed.emit()
+			Events.emit_signal("game_resumed")
 
-func set_current_score(value: int) -> void:
-	self.score_counter.text = str(value)
+func set_current_score(value: int = -1) -> void:
+	if value < 0:
+		self.score_counter.text = str(ScoreManager.current_score)
+	else:
+		self.score_counter.text = str(value)
+
+func set_current_lives(value: int = -1) -> void:
+	match value:
+		0:
+			self.lives_counter.text = ""
+		1:
+			self.lives_counter.text = "X"
+		2:
+			self.lives_counter.text = "XX"
+		3:
+			self.lives_counter.text = "XXX"
+		_:
+			self.score_counter.text = str(ScoreManager.current_score)
 
 func set_high_score(value: int) -> void:
 	self.high_score_counter.text = str(value)
 
-func set_health_bar(value) -> void:
-	self.health_bar.set_value(value)
-
 func _on_play_again_button_pressed() -> void:
-	button_play_again.visible = false
-	button_exit.visible = false
-	Events.game_restarted.emit()
+	get_tree().set_pause(false)
+	level_won.hide()
+	
+	Events.emit_signal("game_restarted")
+	
+	button_play_again.hide()
+	button_exit.hide()
+	button_quit_game.hide()
+
+func on_level_won() -> void:
+	await get_tree().create_timer(0.6).timeout
+	get_tree().set_pause(true)
+	level_won.show()
+	
+	if Global.current_level_id != Global.levels.size():
+		level_won.get_node("Label").text = "Level Complete!"
+		level_won.get_node("Amount").text = "Current Score: " + str(ScoreManager.current_score)
+		button_next_level.grab_focus()
+		button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_next_level))
+		button_next_level.show()
+		button_exit.show()
+		button_quit_game.show()
+	else:
+		level_won.get_node("Label").text = "You Win!"
+		level_won.get_node("Amount").text = "Final Score: " + str(ScoreManager.current_score)
+		_on_game_over()
+		Events.emit_signal("game_won")
+
 
 func _on_game_over() -> void:
-	button_play_again.visible = true
-	button_exit.visible = true
-	button_quit_game.visible = true
+	button_play_again.grab_focus()
+	
+	button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_play_again))
+	button_play_again.show()
+	button_exit.show()
+	button_quit_game.show()
 
 func _on_game_paused() -> void:
-	get_tree().paused = true
-	button_resume.visible = true
-	button_exit.visible = true
-	button_quit_game.visible = true
+	get_tree().set_pause(true)
+	
+	button_resume.grab_focus()
+	button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_resume))
+	button_resume.show()
+	button_exit.show()
+	button_quit_game.show()
 
 func _on_game_resumed() -> void:
-	get_tree().paused = false
-	button_resume.visible = false
-	button_exit.visible = false
-	button_quit_game.visible = false
+	get_tree().set_pause(false)
+	button_resume.hide()
+	button_exit.hide()
+	button_quit_game.hide()
 
 func _on_button_exit_pressed() -> void:
-	get_tree().paused = false
-	get_tree().change_scene_to_packed(scene_to_load)
-	ScoreManager.set_current_score(0)
+	get_tree().set_pause(false)
+	
+	Global._reset()
+	get_tree().change_scene_to_packed(Global.scene_paths["Main_Menu"])
 
 func _on_button_resume_pressed() -> void:
-	Events.game_resumed.emit()
+	Events.emit_signal("game_resumed")
 
 func _on_button_quit_game_pressed():
 	get_tree().quit()
+
+func _on_button_next_level_pressed():
+	Events.emit_signal("next_level")
+	get_tree().set_pause(false)
+	
+	level_won.hide()
+	button_next_level.hide()
+	button_exit.hide()
+	button_quit_game.hide()

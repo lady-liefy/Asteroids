@@ -1,21 +1,18 @@
-extends CharacterBody2D
+### bullet.gd
+extends RigidBody2D
 class_name Bullet
 
-signal hit_obstacle(points)
+const SPEED := 200
 
-const SPEED = 250.0
+func _ready() -> void:
+	$Line2D.width = Global.asteroid_line_weight
+	$Line2D.default_color = Global.line_color
 
-func _physics_process(delta) -> void:
-	# Check for collision while moving
-	var collision = move_and_collide(velocity * SPEED * delta)
-	
-	if collision:
-		var collider = collision.get_collider()
-		var is_obstacle = collider.is_in_group("obstacles")
-		
-		# If obstacle is hit by the bullet, deal it damage and delete bullet
-		if is_obstacle:
-			collider.take_damage(4)
-			
-			hit_obstacle.emit(100)
-			self.queue_free()
+func _physics_process(_delta : float) -> void:
+	Global.screen_wrap(self)
+
+func delete() -> void:
+	self.queue_free()
+
+func _on_timer_timeout():
+	delete()

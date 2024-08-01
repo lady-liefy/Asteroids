@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://br770st3m6h72"]
+
+[ext_resource type="Script" path="res://scripts/asteroid_spawner.gd" id="1_obiow"]
+
+[node name="AsteroidSpawner" type="Node"]
+process_mode = 1
+script = ExtResource("1_obiow")
+group_name = "asteroid"

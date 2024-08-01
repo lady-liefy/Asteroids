@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://clunpvoh2n2nl"]
+
+[ext_resource type="Script" path="res://scripts/scene_main.gd" id="1_a3s2h"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_a3s2h")
+
+[node name="Background" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1280, 720)
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.53775, 0.4505, 0.561365, 1)

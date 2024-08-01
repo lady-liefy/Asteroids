@@ -1,18 +1,21 @@
-[gd_scene load_steps=4 format=3 uid="uid://btq3opu7jlaxs"]
+[gd_scene load_steps=3 format=3 uid="uid://btq3opu7jlaxs"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_csjvd"]
-[ext_resource type="Texture2D" uid="uid://bs3iut62jnrsy" path="res://icon.svg" id="3_mc4kl"]
+[ext_resource type="PackedScene" uid="uid://c1w8pmb4ymt08" path="res://scenes/bullet.tscn" id="2_t457r"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_h05ev"]
-size = Vector2(84, 84)
-
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" groups=["Player"]]
 process_mode = 1
+collision_mask = 12
 script = ExtResource("1_csjvd")
+bullet_scn = ExtResource("2_t457r")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.671875, 0.671875)
-texture = ExtResource("3_mc4kl")
+[node name="Line2D" type="Line2D" parent="."]
+points = PackedVector2Array(-32, -16, -28, -15, -21, -11, -21, 11, -28, 15, -21, 11, -21, -11, -28, -15, 32, 0, -32, 16)
+width = 2.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_h05ev")
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(32, 0, -32, 16, -32, -16)
+
+[node name="ShotTimer" type="Timer" parent="."]
+
+[connection signal="timeout" from="ShotTimer" to="." method="_on_shot_timer_timeout"]
