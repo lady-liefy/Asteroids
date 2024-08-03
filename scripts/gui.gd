@@ -76,26 +76,21 @@ func _on_play_again_button_pressed() -> void:
 	button_quit_game.hide()
 
 func on_level_won() -> void:
-	await get_tree().create_timer(0.6).timeout
+	await get_tree().create_timer(0.5).timeout
 	get_tree().set_pause(true)
 	level_won.show()
 	
-	if Global.current_level_id != Global.levels.size():
-		level_won.get_node("Label").text = "Level Complete!"
-		level_won.get_node("Amount").text = "Current Score: " + str(ScoreManager.current_score)
-		button_next_level.grab_focus()
-		button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_next_level))
-		button_next_level.show()
-		button_exit.show()
-		button_quit_game.show()
-	else:
-		level_won.get_node("Label").text = "You Win!"
-		level_won.get_node("Amount").text = "Final Score: " + str(ScoreManager.current_score)
-		_on_game_over()
-		Events.emit_signal("game_won")
+	level_won.get_node("Label").text = "Level Complete!"
+	button_next_level.grab_focus()
+	button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_next_level))
+	button_next_level.show()
+	button_exit.show()
+	button_quit_game.show()
 
 
 func _on_game_over() -> void:
+	level_won.get_node("Label").text = "Game over!"
+	
 	button_play_again.grab_focus()
 	
 	button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_play_again))

@@ -61,21 +61,22 @@ func subtract_life() -> void:
 
 func set_current_score(value: int) -> void:
 	self.current_score = value
-	
-	# Gain a life at 20,000 points
-	if current_score == points_for_new_life:
-		set_current_lives(current_lives + 1)
-	
+	new_life_check()
 	self.emit_signal("current_score_changed", current_score)
 
-	
 func add_to_current_score(value: int) -> void:
 	self.current_score += value
+	new_life_check()
+	self.emit_signal("current_score_changed", current_score)
 
 func set_high_score(value: int) -> void:
 	self.high_score = value
 	self.emit_signal("high_score_changed", self.high_score)
 
+func new_life_check() -> void:
+	# Gain a life at 20,000 points
+	if current_score == points_for_new_life:
+		set_current_lives(current_lives + 1)
 
 ## SAVE & LOAD -------------------------------------------------
 var save_file_path: String = "user://save_game.bin"

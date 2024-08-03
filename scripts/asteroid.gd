@@ -2,13 +2,19 @@
 extends RigidBody2D
 class_name Asteroid
 
-enum Size { SMALL, MEDIUM, LARGE }
+# Numbers for clarity (they're implied by engine)
+enum Size {
+	SMALL = 1,
+	MEDIUM = 2,
+	LARGE = 3 
+}
 
 @export var size : Size = Size.LARGE
-@export var speed : float = 400.0
+@export var thrust := Vector2.ZERO
+@export var rotate_thrust := 15000
 @export var parts : int   = 4
 
-signal broke(size , vel: Vector2)
+signal broke(size : Size , vel: Vector2)
 
 func _ready() -> void:
 	self._initialize_signals()
@@ -26,24 +32,28 @@ func _initialize() -> void:
 	
 	self.set_enabled(true)
 
-func _physics_process(_delta : float) -> void:
-	Global.screen_wrap(self)
+func _integrate_forces(state : PhysicsDirectBodyState2D) -> void:
+	Global.screen_wrap(self, state)
+	self.resize(state.transform)
 
 func set_velocity(base_vel : Vector2) -> void:
 	var multiplier : int
-	var direction := Vector2(randf_range(-1, 1), randf_range(-1, 1))
+	thrust = Vector2(randf_range(-1, 1), randf_range(-1, 1))
 	
 	if base_vel == Vector2.ZERO:
 		multiplier = randf_range(Global.base_speed.x, Global.base_speed.y)
 	else:
 		multiplier = randf_range(Global.split_speed.x, Global.split_speed.y)
 	
-	linear_velocity = base_vel + (direction.normalized() * Global.speed_factor * multiplier)
+	self.linear_velocity = base_vel + (thrust.normalized() * Global.speed_factor * multiplier)
+
+func resize(trans : Transform2D) -> void:
+	trans.scaled(Vector2(size, size))
 
 func die() -> void:
 	self.set_enabled(false)
 	self.queue_free()
-	broke.emit(self.size, linear_velocity)
+	broke.emit(self.size, global_position, linear_velocity)
 
 func on_game_paused() -> void:
 	self.set_enabled(false)

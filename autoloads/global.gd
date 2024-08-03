@@ -19,6 +19,7 @@ var speed_factor := 1.0
 
 var starting_lives : int = 3
 var asteroids_to_spawn : int = 3
+var respawning := false
 
 func _ready() -> void:
 	_initialize_signals()
@@ -30,6 +31,7 @@ func _initialize_signals() -> void:
 func _reset() -> void:
 	ScoreManager.set_current_score(0)
 	ScoreManager.set_current_lives(starting_lives)
+	respawning = false
 
 func on_game_over() -> void:
 	get_tree().paused = true
@@ -39,20 +41,12 @@ func on_level_won() -> void:
 	current_level_id += 1
 
 # Function to wrap objects around the screen (ship, bullets)
-func screen_wrap(body : Node2D) -> void:
+func screen_wrap(body : RigidBody2D, state : PhysicsDirectBodyState2D) -> void:
 	if body.global_position.x < 0:
-		body.global_position += Vector2(Global.game_window_size.x, 0)
-	elif body.global_position.x > Global.game_window_size.x:
-		body.global_position -= Vector2(Global.game_window_size.x, 0)
+		state.transform.origin.x = game_window_size.x
+	elif body.global_position.x > game_window_size.x:
+		state.transform.origin.x = 0
 	if body.global_position.y < 0:
-		body.global_position += Vector2(0, Global.game_window_size.y)
-	elif body.global_position.y > Global.game_window_size.y:
-		body.global_position -= Vector2(0, Global.game_window_size.y)
-
-func _random_valid_vector2() -> Vector2:
-	randomize()
-	var vector = Vector2(randf_range(64, Global.game_window_size.x - 64), randf_range(64, Global.game_window_size.y - 64))
-#	while !respawning and (vector - $Player.transform.origin).length() < 512:
-#		vector = Vector2(randf_range(64, Global.game_window_size.x - 64), randf_range(64, Global.game_window_size.y - 64))
-	
-	return vector
+		state.transform.origin.y = game_window_size.y
+	elif body.global_position.y > game_window_size.y:
+		state.transform.origin.y = 0

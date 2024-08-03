@@ -5,7 +5,6 @@ extends Node
 @onready var current_level : Node2D = $Level
 
 var player_prefab = preload("res://scenes/player.tscn")
-var respawning := false
 
 func _ready() -> void:
 	reset()
@@ -20,7 +19,6 @@ func reset() -> void:
 	
 	await get_tree().process_frame
 	if not get_tree().get_nodes_in_group("Player"):
-		respawning = true
 		spawn_player()
 
 
@@ -40,18 +38,21 @@ func clear_level() -> void:
 			asteroid.queue_free()
 
 func spawn_player() -> void:
-	player = player_prefab.instantiate()
+	Global.respawning = true
+	player = player_prefab.instantiate() as Player
 	call_deferred("add_child", player)
 	
 	if not player.is_in_group("player"):
 		player.add_to_group("player")
 		
 	player.position = Global.game_window_size / 2
-	respawning = false
+	
+	await get_tree().process_frame
+	Global.respawning = false
+	Events.emit_signal("player_respawned")
 
 func on_player_died() -> void:
 	await get_tree().process_frame
-	respawning = true
 	player = null
 	
 	if ScoreManager.current_lives > 0:
@@ -63,7 +64,7 @@ func on_player_died() -> void:
 
 func on_level_won() -> void:
 	await get_tree().process_frame
-	player.queue_free()
+#	player.queue_free()
 	player = null
 	
 	await Events.next_level
