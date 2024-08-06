@@ -25,7 +25,7 @@ func _ready() -> void:
 	_initialize_signals()
 
 func _initialize_signals() -> void:
-	Events.level_won.connect(on_level_won)
+	Events.next_level.connect(on_next_level)
 	Events.game_over.connect(on_game_over)
 
 func _reset() -> void:
@@ -37,7 +37,7 @@ func on_game_over() -> void:
 	get_tree().paused = true
 	_reset()
 
-func on_level_won() -> void:
+func on_next_level() -> void:
 	current_level_id += 1
 
 # Function to wrap objects around the screen (ship, bullets)

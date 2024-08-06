@@ -10,7 +10,7 @@ class_name Player
 @export_category("Shooting")
 @export var rate_of_fire := 0.1
 @export var max_bullets := 4
-@export var bullet_scn : Resource
+@export var bullet_scn : Resource  # how to get a PackedScene
 
 @onready var collision_shape_2d = $CollisionPolygon2D
 
@@ -21,8 +21,8 @@ var can_shoot = true
 var acceleration := Vector2.ZERO
 
 func _ready() -> void:
-	self._initialize()
 	self._initialize_signals()
+	self._initialize()
 
 func _initialize_signals() -> void:
 	Events.game_paused.connect(_on_game_paused)
@@ -30,18 +30,14 @@ func _initialize_signals() -> void:
 
 func _initialize() -> void:
 	$Line2D.set_default_color(Global.line_color)
-	$Line2D.set_width(Global.ship_line_weight)
-	
-	set_contact_monitor(true)
-	set_max_contacts_reported(1)
-	set_continuous_collision_detection_mode(CCD_MODE_CAST_SHAPE)
-	
+	$Line2D.set_width(Global.ship_line_weight)	
 	$ShotTimer.set_wait_time(rate_of_fire)
+	is_boosting = false
+	
 	await get_tree().create_timer(2.0).timeout
 	is_invincible = false
-	is_boosting = false
 	can_shoot = true
-
+	
 func _on_game_paused() -> void:
 	self.set_enabled(false)
 	get_tree().set_pause(true)
@@ -104,9 +100,6 @@ func set_enabled(value: bool) -> void:
 		self.set_process_unhandled_input(false)
 		self.set_physics_process(false)
 
-func on_score() -> void:
-	ScoreManager.emit_signal("current_score_added")
-
 func die() -> void:
 	self.set_enabled(false)
 	Events.emit_signal("player_died")
@@ -117,5 +110,8 @@ func _on_shot_timer_timeout() -> void:
 	can_shoot = true
 
 func _on_body_entered(body : Node2D) -> void:
+	if is_invincible:
+		return
+	
 	if body.is_in_group("asteroid"):
 		self.die()

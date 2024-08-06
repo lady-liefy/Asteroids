@@ -80,7 +80,7 @@ func on_level_won() -> void:
 	get_tree().set_pause(true)
 	level_won.show()
 	
-	level_won.get_node("Label").text = "Level Complete!"
+	level_won.get_node("Label").text = "Finished Level " + str(Global.current_level_id + 1)
 	button_next_level.grab_focus()
 	button_exit.set_focus_neighbor(SIDE_TOP, button_exit.get_path_to(button_next_level))
 	button_next_level.show()

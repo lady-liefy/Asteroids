@@ -3,15 +3,25 @@
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_csjvd"]
 [ext_resource type="PackedScene" uid="uid://c1w8pmb4ymt08" path="res://scenes/bullet.tscn" id="2_t457r"]
 
-[node name="Player" type="RigidBody2D" groups=["Player"]]
+[node name="Player" type="RigidBody2D" groups=["player"]]
 process_mode = 1
 collision_mask = 12
+continuous_cd = 2
+max_contacts_reported = 1
+contact_monitor = true
+linear_damp_mode = 1
+linear_damp = 0.2
+angular_damp_mode = 1
+angular_damp = 8.0
 script = ExtResource("1_csjvd")
 bullet_scn = ExtResource("2_t457r")
 
 [node name="Line2D" type="Line2D" parent="."]
 points = PackedVector2Array(-32, -16, -28, -15, -21, -11, -21, 11, -28, 15, -21, 11, -21, -11, -28, -15, 32, 0, -32, 16)
 width = 2.0
+joint_mode = 1
+end_cap_mode = 2
+antialiased = true
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(32, 0, -32, 16, -32, -16)

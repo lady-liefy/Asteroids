@@ -4,15 +4,16 @@ extends Node
 @export var points_per_second = 10
 @export var scroll_speed = 300
 
-@export var points_comet_large = 250
-@export var points_comet_medium = 100
-@export var points_comet_small = 25
+@export var points_comet_large = 20
+@export var points_comet_medium = 50
+@export var points_comet_small = 100
 @export var points_comet_dead = 1000
 
 @export var points_enemy_part = 150					# all 4 parts = 600 points
 @export var points_life_left = 200
 
 @export var points_for_new_life = 10000				# New life at 10,000 points
+@export var max_points = 99990
 
 @onready var current_score : int = 0
 @onready var high_score : int = 0
@@ -24,6 +25,7 @@ signal high_score_changed(new_high_score: int)
 signal high_score_beaten
 
 var was_high_score_beaten: bool = false
+var new_life_count := 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -34,9 +36,6 @@ func _initialize_signals() -> void:
 	Events.game_over.connect(self.on_game_over)
 	Events.game_restarted.connect(self.on_game_restarted)
 	Events.player_died.connect(self.on_player_died)
-
-func _physics_process(_delta) -> void:
-	pass
 
 func on_player_died() -> void:
 	if current_lives >= 0:
@@ -49,6 +48,7 @@ func on_game_over() -> void:
 
 func on_game_restarted() -> void:
 	self.set_current_score(0)
+	new_life_count = 0
 	was_high_score_beaten = false
 
 func set_current_lives(value: int) -> void:
@@ -74,9 +74,16 @@ func set_high_score(value: int) -> void:
 	self.emit_signal("high_score_changed", self.high_score)
 
 func new_life_check() -> void:
-	# Gain a life at 20,000 points
-	if current_score == points_for_new_life:
+	# Gain a life at 10,000 points
+	if current_score >= (points_for_new_life * new_life_count):
 		set_current_lives(current_lives + 1)
+		new_life_count += 1
+
+# Reset score on hitting "limit" (fun leftover from original game =] )
+func turnover_score() -> void:
+	if current_score >= max_points:
+		set_current_score(0)
+		new_life_count = 0
 
 ## SAVE & LOAD -------------------------------------------------
 var save_file_path: String = "user://save_game.bin"

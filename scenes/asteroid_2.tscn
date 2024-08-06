@@ -4,11 +4,16 @@
 
 [node name="Asteroid" type="RigidBody2D"]
 collision_layer = 8
+continuous_cd = 1
+max_contacts_reported = 1
+contact_monitor = true
 script = ExtResource("1_lfbsy")
 
 [node name="Line2D" type="Line2D" parent="."]
 points = PackedVector2Array(11, -3, 11, 4, 6, 10, 1, 10, 1, 4, -5, 10, -9, 3, -5, 1, -9, -2, -2, -10, 5, -10, 11, -3)
 width = 1.0
+joint_mode = 1
+antialiased = true
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(11, -3, 11, 4, 6, 10, 1, 10, 1, 4, -5, 10, -9, 3, -5, 1, -9, -2, -2, -10, 5, -10)

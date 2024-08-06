@@ -28,13 +28,14 @@ func _initialize_signals() -> void:
 
 func _initialize() -> void:	
 	$Line2D.set_default_color(Global.line_color)
-	$Line2D.set_width(Global.asteroid_line_weight)
+	$Line2D.set_width(Global.asteroid_line_weight / self.size)
+	set_contact_monitor(true)
 	
+	self.resize()
 	self.set_enabled(true)
 
 func _integrate_forces(state : PhysicsDirectBodyState2D) -> void:
 	Global.screen_wrap(self, state)
-	self.resize(state.transform)
 
 func set_velocity(base_vel : Vector2) -> void:
 	var multiplier : int
@@ -47,8 +48,9 @@ func set_velocity(base_vel : Vector2) -> void:
 	
 	self.linear_velocity = base_vel + (thrust.normalized() * Global.speed_factor * multiplier)
 
-func resize(trans : Transform2D) -> void:
-	trans.scaled(Vector2(size, size))
+func resize() -> void:
+	$Line2D.set_scale(Vector2(size, size))
+	$CollisionPolygon2D.set_scale(Vector2(size, size))
 
 func die() -> void:
 	self.set_enabled(false)

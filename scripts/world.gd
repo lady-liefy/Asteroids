@@ -23,8 +23,6 @@ func reset() -> void:
 
 
 func clear_level() -> void:
-#	if current_level != null and is_instance_valid(current_level):
-#		current_level.queue_free()
 	if is_instance_valid(player):
 		player.queue_free()
 	for enemy in get_tree().get_nodes_in_group("enemy"):
@@ -44,7 +42,7 @@ func spawn_player() -> void:
 	
 	if not player.is_in_group("player"):
 		player.add_to_group("player")
-		
+	
 	player.position = Global.game_window_size / 2
 	
 	await get_tree().process_frame
@@ -53,7 +51,6 @@ func spawn_player() -> void:
 
 func on_player_died() -> void:
 	await get_tree().process_frame
-	player = null
 	
 	if ScoreManager.current_lives > 0:
 		spawn_player()
@@ -63,9 +60,5 @@ func on_player_died() -> void:
 		reset()
 
 func on_level_won() -> void:
-	await get_tree().process_frame
-#	player.queue_free()
-	player = null
-	
 	await Events.next_level
 	reset()
